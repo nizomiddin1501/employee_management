@@ -96,5 +96,6 @@ For any inquiries or issues, feel free to contact:
 
 Name: Nizomiddin Mirzanazarov
 Email: nizomiddinmirzanazarov@gmail.com
+My portfolio:  https://nizomiddin-portfolio.netlify.app/
 
 
