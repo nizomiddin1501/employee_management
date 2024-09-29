@@ -19,13 +19,16 @@ public class CalculationTable {
     @Schema(description = "The employee related to this calculation", example = "Employee(id=1, firstName=Nizomiddin, lastName=Mirzanazarov)")
     private Employee employee;
 
+    @Column(nullable = false)
     @Schema(description = "The amount of calculation", example = "5000.0")
     private Double amount;
 
+    @Column(nullable = false)
     @Schema(description = "The rate used for the calculation", example = "10.5")
     private Double rate;
 
     @Temporal(TemporalType.DATE)
+    @Column(nullable = false)
     @Schema(description = "The date of the calculation", example = "2023-09-28")
     private Date date;
 
@@ -34,6 +37,7 @@ public class CalculationTable {
     @Schema(description = "The organization for which the calculation is being made", example = "Organization(id=1, name=Zero:One Group)")
     private Organization organization;
 
+    @Column(length = 20, nullable = false)
     @Schema(description = "The type of the calculation", example = "Salary")
     private String calculationType;
 

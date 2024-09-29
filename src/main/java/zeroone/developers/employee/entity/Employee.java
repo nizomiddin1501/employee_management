@@ -14,17 +14,21 @@ public class Employee {
     @Schema(description = "Unique Identifier of the Employee", example = "1")
     private Long id;
 
+    @Column(nullable = false, length = 50)
     @Schema(description = "Employee's first name", example = "Nizomiddin")
     private String firstName;
 
+    @Column(length = 50)
     @Schema(description = "Employee's last name", example = "Mirzanazarov")
     private String lastName;
 
+    @Column(length = 50, unique = true)
     @Schema(description = "Employee's personal identification number (PINFL)", example = "12345678901234")
     private String pinfl;
 
-    @Schema(description = "Date when the employee was hired", example = "2024-05-10")
+    @Column(nullable = false)
     @Temporal(TemporalType.DATE)
+    @Schema(description = "Date when the employee was hired", example = "2024-05-10")
     private Date hireDate;
 
     @ManyToOne

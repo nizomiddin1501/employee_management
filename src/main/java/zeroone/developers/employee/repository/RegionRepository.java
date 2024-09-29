@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import zeroone.developers.employee.entity.Region;
 
-@Repository
-public interface RegionRepository extends JpaRepository<Region,Long> {
+public interface RegionRepository extends BaseRepository<Region,Long> {
 
 }

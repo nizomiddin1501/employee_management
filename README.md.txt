@@ -57,8 +57,8 @@ spring.jpa.hibernate.ddl-auto=update
 
 1. Clone the repository:
 
-git clone <repository-url>
-cd employee-management-system
+git clone https://github.com/nizomiddin1501/employee_management
+cd employee-management
 
 2. Install the dependencies and build the project:
 

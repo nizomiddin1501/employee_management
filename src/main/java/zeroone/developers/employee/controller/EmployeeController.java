@@ -11,7 +11,9 @@ import zeroone.developers.employee.service.EmployeeService;
 
 import java.util.List;
 import java.util.Optional;
-
+/**
+ * EmployeeController RESTfull API orqali xodimlar bilan bog'liq CRUD operatsiyalarini boshqaradi.
+ */
 @RestController
 @RequestMapping("/api/employees")
 public class EmployeeController {
@@ -19,12 +21,27 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
+    /**
+     * EmployeeController konstruktorida EmployeeService obyektini in'ektsiya qiladi.
+     *
+     * @param employeeService xodimlar bilan bog'liq CRUD operatsiyalarni amalga oshirish uchun EmployeeService obyekt.
+     */
     @Autowired
     public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;
     }
 
-    //read all
+
+    /**
+     * Barcha xodimlarni qaytaradi.
+     *
+     * @return xodimlar ro'yxatini qaytaradigan ResponseEntity obyekti
+     *
+     * @example
+     * <pre>
+     * GET /api/employees
+     * </pre>
+     */
     @Operation(summary = "Get all Employees", description = "Retrieve a list of all employees.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved the list of employees.")
     @GetMapping
@@ -32,7 +49,18 @@ public class EmployeeController {
         return employeeService.findAllEmployees();
     }
 
-    //read by ID
+
+    /**
+     * ID bo'yicha xodimni qaytaradi.
+     *
+     * @param id qidirilayotgan xodimning ID raqami
+     * @return topilgan xodimni qaytaradigan ResponseEntity obyekti
+     *
+     * @example
+     * <pre>
+     * GET /api/employees/{id}
+     * </pre>
+     */
     @Operation(summary = "Get Employee by ID", description = "Retrieve an employee by their unique identifier.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved the employee.")
     @ApiResponse(responseCode = "404", description = "Employee not found.")
@@ -43,7 +71,19 @@ public class EmployeeController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    //create
+
+
+    /**
+     * Yangi xodim qo'shadi.
+     *
+     * @param employee saqlanadigan xodim ma'lumotlari
+     * @return saqlangan xodimni qaytaradigan ResponseEntity obyekti
+     *
+     * @example
+     * <pre>
+     * POST /api/employees
+     * </pre>
+     */
     @Operation(summary = "Create a new Employee", description = "Create a new employee record.")
     @ApiResponse(responseCode = "201", description = "Employee created successfully.")
     @PostMapping
@@ -52,7 +92,20 @@ public class EmployeeController {
         return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
     }
 
-    //update
+
+
+    /**
+     * Mavjud xodimni yangilaydi.
+     *
+     * @param id yangilanishi kerak bo'lgan xodimning ID raqami
+     * @param employeeDetails yangilanadigan xodim ma'lumotlari
+     * @return yangilangan xodimni qaytaradigan ResponseEntity obyekti
+     *
+     * @example
+     * <pre>
+     * PUT /api/employees/{id}
+     * </pre>
+     */
     @Operation(summary = "Update an existing Employee", description = "Update the details of an existing employee.")
     @ApiResponse(responseCode = "200", description = "Employee updated successfully.")
     @ApiResponse(responseCode = "404", description = "Employee not found")
@@ -69,7 +122,19 @@ public class EmployeeController {
         }
     }
 
-    //delete
+
+
+    /**
+     * Xodimni o'chiradi.
+     *
+     * @param id o'chirilishi kerak bo'lgan xodimning ID raqami
+     * @return hech qanday mazmun qaytarmaydigan ResponseEntity obyekti
+     *
+     * @example
+     * <pre>
+     * DELETE /api/employees/{id}
+     * </pre>
+     */
     @Operation(summary = "Delete Employee", description = "Delete an employee by its ID.")
     @ApiResponse(responseCode = "204", description = "Employee deleted successfully.")
     @ApiResponse(responseCode = "404", description = "Employee not found.")

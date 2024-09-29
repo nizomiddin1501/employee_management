@@ -10,6 +10,7 @@ public class EmployeeApplication {
         SpringApplication.run(EmployeeApplication.class, args);
     }
 
+    //for swagger documentation
     //http://localhost:8080/swagger-ui/index.html
 
 }

@@ -13,6 +13,7 @@ public class Organization {
     @Schema(description = "Unique Identifier of the Organization", example = "1")
     private Long id;
 
+    @Column(nullable = false, length = 50, unique = true)
     @Schema(description = "Name of the organization", example = "Zero:One Group")
     private String name;
 
