@@ -62,12 +62,17 @@ public class RegionServiceImpl implements RegionService {
      *
      * @param region the region to save
      * @return the saved region
-     * @throws RegionException if the region data is invalid
+     * @throws RegionException if the region name is null or already exists
      */
     @Override
     public Region saveRegion(Region region) throws RegionException{
         if (region.getName() == null) {
             throw new RegionException("Region name must not be null");
+        }
+        // name mavjudligini tekshirish
+        boolean exists = regionRepository.existsByName(region.getName());
+        if (exists) {
+            throw new RegionException("Organization with this name already exists");
         }
         return regionRepository.save(region);
     }

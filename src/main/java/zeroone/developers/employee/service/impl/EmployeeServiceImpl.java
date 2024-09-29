@@ -57,14 +57,24 @@ public class EmployeeServiceImpl implements EmployeeService {
     /**
      * Save a new employee or update an existing one.
      *
+     * This method validates that the employee's first name and last name are not null,
+     * and checks if an employee with the same first name and last name already exists
+     * in the database.
+     *
      * @param employee the employee to save
      * @return the saved employee
-     * @throws EmployeeException if the employee data is invalid
+     * @throws EmployeeException if the employee data is invalid,
+     *                           or if an employee with the same first name and last name already exists
      */
     @Override
     public Employee saveEmployee(Employee employee) throws EmployeeException{
         if (employee.getFirstName() == null || employee.getLastName() == null) {
             throw new EmployeeException("Employee first name and last name must not be null");
+        }
+        // firstName va lastName ustunlari mavjud bo'lmasligini tekshirish
+        boolean exists = employeeRepository.existsByFirstNameAndLastName(employee.getFirstName(), employee.getLastName());
+        if (exists) {
+            throw new EmployeeException("Employee with this first name and last name already exists");
         }
         return employeeRepository.save(employee);
     }

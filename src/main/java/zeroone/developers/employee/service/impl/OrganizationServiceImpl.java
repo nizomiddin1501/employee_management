@@ -60,12 +60,17 @@ public class OrganizationServiceImpl implements OrganizationService {
      *
      * @param organization the organization to save
      * @return the saved organization
-     * @throws OrganizationException if the organization data is invalid
+     * @throws OrganizationException if the organization name is null or already exists
      */
     @Override
     public Organization saveOrganization(Organization organization) throws OrganizationException{
         if (organization.getName() == null) {
             throw new OrganizationException("Organization name and address must not be null");
+        }
+        // name mavjudligini tekshirish
+        boolean exists = organizationRepository.existsByName(organization.getName());
+        if (exists) {
+            throw new OrganizationException("Organization with this name already exists");
         }
         return organizationRepository.save(organization);
     }

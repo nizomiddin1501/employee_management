@@ -10,7 +10,7 @@ public class Region {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Unique Identifier of the Region", example = "1")
+    @Schema(hidden = true)
     private Long id;
 
     @Column(nullable = false, length = 20)

@@ -10,7 +10,7 @@ public class Organization {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Unique Identifier of the Organization", example = "1")
+    @Schema(hidden = true)
     private Long id;
 
     @Column(nullable = false, length = 50, unique = true)

@@ -11,7 +11,7 @@ import java.sql.Date;
 public class CalculationTable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Unique Identifier of the CalculationTable",example = "1")
+    @Schema(hidden = true)
     private Long id;
 
     @ManyToOne
@@ -38,7 +38,7 @@ public class CalculationTable {
     private Organization organization;
 
     @Column(length = 20, nullable = false)
-    @Schema(description = "The type of the calculation", example = "Salary")
+    @Schema(description = "The type of the calculation", example = "SALARY")
     private String calculationType;
 
     public CalculationTable() {

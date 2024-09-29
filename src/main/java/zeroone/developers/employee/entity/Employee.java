@@ -11,7 +11,7 @@ import java.sql.Date;
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Unique Identifier of the Employee", example = "1")
+    @Schema(hidden = true)
     private Long id;
 
     @Column(nullable = false, length = 50)
