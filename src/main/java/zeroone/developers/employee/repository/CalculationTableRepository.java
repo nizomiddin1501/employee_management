@@ -74,7 +74,7 @@ public interface CalculationTableRepository extends BaseRepository<CalculationTa
      * @param month the month to filter records by
      * @return a list of Object arrays containing employee details and their salary amount
      */
-    @Query(value = "select e.*, c.amount from calculation_table c " +
+    @Query(value = "select distinct e.*, c.amount from calculation_table c " +
             "join employee e on c.employee_id = e.id " +
             "where extract(month from c.date) = :month " +
             "and (c.calculation_type = 'SALARY' OR c.calculation_type = 'VACATION')",
