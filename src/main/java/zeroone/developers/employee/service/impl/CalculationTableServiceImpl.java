@@ -1,21 +1,28 @@
 package zeroone.developers.employee.service.impl;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import zeroone.developers.employee.entity.CalculationTable;
 import zeroone.developers.employee.exception.CalculationTableException;
 import zeroone.developers.employee.exception.ResourceNotFoundException;
+import zeroone.developers.employee.payload.CalculationTableDto;
 import zeroone.developers.employee.repository.CalculationTableRepository;
 import zeroone.developers.employee.service.CalculationTableService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 /**
  * Implementation of the CalculationTableService interface.
  * Provides CRUD operations and custom queries for CalculationTable entities.
  */
 @Service
 public class CalculationTableServiceImpl implements CalculationTableService {
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     private final CalculationTableRepository calculationTableRepository;
 
@@ -86,77 +93,126 @@ public class CalculationTableServiceImpl implements CalculationTableService {
     //crud methods
 
     /**
-     * Retrieve all calculation records.
+     * Retrieve all calculationTable records as DTOs.
      *
-     * @return a list of all calculation records
+     * This method retrieves all calculationTable entities from the database,
+     * converts them to DTOs, and returns the list of CalculationTableDto objects.
+     *
+     * @return a list of CalculationTableDto representing all calculationTables
      */
     @Override
-    public List<CalculationTable> findAllCalculations() {
-        return calculationTableRepository.findAll();
+    public List<CalculationTableDto> findAllCalculations() {
+        List<CalculationTable> calculationTables = calculationTableRepository.findAll();
+
+        // Convert the list of CalculationTable entities to CalculationTableDto
+        return calculationTables.stream()
+                .map(this::calculationTableToDto)
+                .collect(Collectors.toList());
     }
 
 
     /**
-     * Retrieves a calculation record by their ID.
+     * Retrieve a calculationTable by ID.
      *
-     * @param id the ID of the CalculationTable
-     * @return an Optional containing the found CalculationTable, or throws ResourceNotFoundException if not found
-     * @throws ResourceNotFoundException if the CalculationTable with the specified ID is not found
+     * This method fetches the calculationTable entity by ID, maps it to a DTO, and returns it.
+     *
+     * @param id the ID of the calculationTable
+     * @return an Optional containing the calculationTable as a DTO if found
+     * @throws ResourceNotFoundException if the calculationTable is not found with the given ID
      */
     @Override
-    public Optional<CalculationTable> findCalculationById(Long id) {
-        return Optional.ofNullable(calculationTableRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Calculation not found with id " + id)));
+    public Optional<CalculationTableDto> findCalculationById(Long id) {
+        CalculationTable calculationTable = calculationTableRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Calculation not found with id " + id));
+
+        // Convert CalculationTable entity to CalculationTableDto
+        CalculationTableDto calculationTableDto = calculationTableToDto(calculationTable);
+        return Optional.ofNullable(calculationTableDto);
     }
 
-
+ /// bunga alohida doc yoz
     /**
      * Save a new calculation record.
      *
-     * @param calculation the calculation record to save
-     * @return the saved calculation record
-     * @throws CalculationTableException if the calculation data is invalid
+     * This method saves a new calculationTable based on the provided DTO.
+     * It validates that the amount is positive and that an employee is associated
+     * with the calculation before saving the new record to the database.
+     *
+     * @param calculationTableDto the DTO containing the calculationTable details to save
+     * @return the saved calculationTable as a DTO
+     * @throws CalculationTableException if the calculationTable data is invalid,
+     *         such as a non-positive amount or missing employee
      */
     @Override
-    public CalculationTable saveCalculation(CalculationTable calculation) throws CalculationTableException{
-        if (calculation.getAmount() <= 0) {
-            throw new CalculationTableException("Calculation field must be positive");
+    public CalculationTableDto saveCalculation(CalculationTableDto calculationTableDto) throws CalculationTableException {
+        // 1. Convert DTO to entity
+        CalculationTable calculationTable = dtoToCalculationTable(calculationTableDto);
+
+        // 2. Perform business checks on the entity
+
+        // Check if the amount is positive using repository query
+        if (calculationTableRepository.existsInvalidAmount()) {
+            throw new CalculationTableException("Calculation amount must be positive");
         }
-        return calculationTableRepository.save(calculation);
+
+        // Check if the employee exists using repository query
+        if (!calculationTableRepository.existsByEmployeeId(calculationTable.getEmployee().getId())) {
+            throw new CalculationTableException("Employee must be provided for the calculation");
+        }
+
+        // 3. Save CalculationTable
+        CalculationTable savedCalculationTable = calculationTableRepository.save(calculationTable);
+
+        // 4. Convert the saved CalculationTable to DTO and return
+        return calculationTableToDto(savedCalculationTable);
     }
 
 
     /**
-     * Updates an existing CalculationTable entity by their ID.
+     * Update an existing calculationTable's details.
      *
-     * @param id                    the ID of the CalculationTable to be updated
-     * @param calculationTableDetails the details to update the CalculationTable entity
-     * @return the updated CalculationTable entity
-     * @throws ResourceNotFoundException if the CalculationTable with the specified ID is not found
-     * @throws CalculationTableException if the calculation data is invalid
+     * This method updates the calculationTable's details based on the provided DTO.
+     * It validates that the calculationTable exists, and updates the necessary fields
+     * before saving the changes to the database.
+     *
+     * @param id the ID of the calculationTable to update
+     * @param calculationTableDto the DTO containing the new calculationTable details
+     * @return the updated calculationTable as a DTO
+     * @throws ResourceNotFoundException if the calculationTable is not found with the given ID
+     * @throws CalculationTableException if the calculationTable data is invalid
      */
     @Override
-    public CalculationTable updateCalculationTable(Long id, CalculationTable calculationTableDetails) throws CalculationTableException{
-        CalculationTable calculationTable = calculationTableRepository.findById(id)
+    public CalculationTableDto updateCalculationTable(Long id, CalculationTableDto calculationTableDto) throws CalculationTableException{
+        CalculationTable existingCalculationTable = calculationTableRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("CalculationTable not found with id: " + id));
 
-        // Updating the fields
-        calculationTable.setAmount(calculationTableDetails.getAmount());
-        calculationTable.setRate(calculationTableDetails.getRate());
-        calculationTable.setDate(calculationTableDetails.getDate());
-        calculationTable.setEmployee(calculationTableDetails.getEmployee());
-        calculationTable.setOrganization(calculationTableDetails.getOrganization());
-        calculationTable.setCalculationType(calculationTableDetails.getCalculationType());
+        // Conversion DTO to entity
+        CalculationTable calculationTableDetails = dtoToCalculationTable(calculationTableDto);
 
-        return calculationTableRepository.save(calculationTable);
+        // Update calculationTable details
+        existingCalculationTable.setAmount(calculationTableDetails.getAmount());
+        existingCalculationTable.setRate(calculationTableDetails.getRate());
+        existingCalculationTable.setDate(calculationTableDetails.getDate());
+        existingCalculationTable.setEmployee(calculationTableDetails.getEmployee());
+        existingCalculationTable.setOrganization(calculationTableDetails.getOrganization());
+        existingCalculationTable.setCalculationType(calculationTableDetails.getCalculationType());
+
+        // Save updated calculationTable
+        CalculationTable updatedCalculationTable = calculationTableRepository.save(existingCalculationTable);
+
+        // Convert updated calculationTable entity to DTO and return
+        return calculationTableToDto(updatedCalculationTable);
     }
 
 
     /**
-     * Deletes a CalculationTable entity by their ID.
+     * Delete an calculationTable by their ID.
      *
-     * @param id the ID of the CalculationTable to be deleted
-     * @throws ResourceNotFoundException if the CalculationTable with the specified ID is not found
+     * This method looks up the calculationTable by their ID. If the calculationTable is found, it is deleted
+     * from the database. If not, a ResourceNotFoundException is thrown.
+     *
+     * @param id the ID of the calculationTable to delete
+     * @throws ResourceNotFoundException if the calculationTable is not found with the given ID
      */
     @Override
     public void deleteCalculation(Long id) {
@@ -164,6 +220,19 @@ public class CalculationTableServiceImpl implements CalculationTableService {
                 .orElseThrow(() -> new ResourceNotFoundException("Calculation not found with id " + id));
         calculationTableRepository.deleteById(id);
     }
+
+
+
+    // DTO to Entity conversion
+    public CalculationTable dtoToCalculationTable(CalculationTableDto calculationTableDto) {
+        return modelMapper.map(calculationTableDto, CalculationTable.class);
+    }
+
+    // Entity to DTO conversion
+    public CalculationTableDto calculationTableToDto(CalculationTable calculationTable) {
+        return modelMapper.map(calculationTable, CalculationTableDto.class);
+    }
+
 
 
 }

@@ -1,9 +1,15 @@
 package zeroone.developers.employee.payload;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
+
 public class OrganizationDto {
 
 
     private Long id;
+
+    @NotEmpty(message = "Name is required")
+    @Size(min = 2, message = "Name must be at least 2 characters")
     private String name;
     private RegionDto region;
     private OrganizationDto parent;

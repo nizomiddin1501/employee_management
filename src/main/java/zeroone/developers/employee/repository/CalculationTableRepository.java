@@ -1,6 +1,5 @@
 package zeroone.developers.employee.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import zeroone.developers.employee.entity.CalculationTable;
@@ -12,7 +11,37 @@ import java.util.List;
  */
 public interface CalculationTableRepository extends BaseRepository<CalculationTable,Long> {
 
+    //check queries
 
+    /**
+     * Check if there are any calculation records with a non-positive amount.
+     *
+     * This method queries the database to determine if there are any records
+     * in the calculation_table where the amount is less than or equal to zero.
+     *
+     * @return true if there are any records with a non-positive amount, false otherwise
+     */
+    @Query(value = "select count(*) > 0 from calculation_table where amount <= 0", nativeQuery = true)
+    boolean existsInvalidAmount();
+
+
+
+
+    /**
+     * Check if any calculation records exist for a given employee.
+     *
+     * This method queries the database to determine if there are any records
+     * in the calculation_table associated with the specified employee ID.
+     *
+     * @param employeeId the ID of the employee to check for associated calculation records
+     * @return true if there are any calculation records for the given employee ID, false otherwise
+     */
+    @Query(value = "select count(*) > 0 from calculation_table where employee_id = :employeeId", nativeQuery = true)
+    boolean existsByEmployeeId(@Param("employeeId") Long employeeId);
+
+
+
+    /////
 
     //native queries
 
@@ -80,6 +109,12 @@ public interface CalculationTableRepository extends BaseRepository<CalculationTa
             "and (c.calculation_type = 'SALARY' OR c.calculation_type = 'VACATION')",
             nativeQuery = true)
     List<Object[]> findEmployeesWithSalariesAndVacations(@Param("month") int month);
+
+
+
+
+
+
 
 
 }

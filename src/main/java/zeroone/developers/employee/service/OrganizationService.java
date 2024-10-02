@@ -1,8 +1,10 @@
 package zeroone.developers.employee.service;
 
 import zeroone.developers.employee.entity.Organization;
+import zeroone.developers.employee.exception.EmployeeException;
 import zeroone.developers.employee.exception.OrganizationException;
 import zeroone.developers.employee.exception.ResourceNotFoundException;
+import zeroone.developers.employee.payload.OrganizationDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,47 +17,61 @@ public interface OrganizationService {
 
 
     /**
-     * Retrieve all organizations.
+     * Retrieve all organization records as DTOs.
      *
-     * @return a list of all organizations
+     * This method retrieves all organization entities from the database,
+     * converts them to OrganizationDto objects, and returns the list of DTOs.
+     *
+     * @return a list of OrganizationDto representing all organization records
      */
-    List<Organization> findAllOrganizations();
+    List<OrganizationDto> findAllOrganizations();
 
 
 
     /**
-     * Retrieve an organization by its ID.
+     * Retrieve an organization by their ID.
+     *
+     * This method fetches the organization data by ID and returns it as a DTO.
      *
      * @param id the ID of the organization
-     * @return an Optional containing the organization if found
-     * @throws ResourceNotFoundException if the organization is not found
+     * @return an Optional containing the organization as a DTO if found, otherwise empty
+     * @throws ResourceNotFoundException if the organization with the given ID does not exist
      */
-    Optional<Organization> findOrganizationById(Long id) throws ResourceNotFoundException;
+    Optional<OrganizationDto> findOrganizationById(Long id) throws ResourceNotFoundException;
 
 
     /**
-     * Save a new organization.
+     * Save a new organization record.
      *
-     * @param organization the organization to save
-     * @return the saved organization
-     * @throws OrganizationException if the organization data is invalid
+     * This method saves a new organization using the information provided in the OrganizationDto
+     * and returns the saved organization as an OrganizationDto.
+     *
+     * @param organizationDto the DTO containing the organization information to be saved
+     * @return the saved organization as a DTO
+     * @throws EmployeeException if the organization data is invalid
      */
-    Organization saveOrganization(Organization organization) throws OrganizationException;
+    OrganizationDto saveOrganization(OrganizationDto organizationDto) throws OrganizationException;
 
 
     /**
-     * Update an existing organization.
+     * Update an existing organization record.
      *
-     * @param id the ID of the organization to update
-     * @param organizationDetails the new organization details
-     * @return the updated organization
-     * @throws ResourceNotFoundException if the organization is not found
+     * This method updates the details of an organization based on the provided organization ID
+     * and the new details contained in the OrganizationDto. It returns the updated organization
+     * as an OrganizationDto.
+     *
+     * @param id the ID of the organization to be updated
+     * @param organizationDto the new details for the organization
+     * @return the updated organization as a DTO
+     * @throws ResourceNotFoundException if the organization is not found with the given ID
      */
-    Organization updateOrganization(Long id, Organization organizationDetails) throws ResourceNotFoundException;
+    OrganizationDto updateOrganization(Long id, OrganizationDto organizationDto) throws ResourceNotFoundException;
 
 
     /**
      * Delete an organization by their ID.
+     *
+     * This method finds the organization by their ID and removes the organization from the database.
      *
      * @param id the ID of the organization to delete
      * @throws ResourceNotFoundException if the organization is not found

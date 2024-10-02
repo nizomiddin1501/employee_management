@@ -1,7 +1,9 @@
 package zeroone.developers.employee.service;
 import zeroone.developers.employee.entity.CalculationTable;
 import zeroone.developers.employee.exception.CalculationTableException;
+import zeroone.developers.employee.exception.EmployeeException;
 import zeroone.developers.employee.exception.ResourceNotFoundException;
+import zeroone.developers.employee.payload.CalculationTableDto;
 
 
 import java.util.List;
@@ -14,51 +16,65 @@ public interface CalculationTableService {
 
 
     /**
-     * Get all calculation records.
+     * Retrieve all calculationTable records as DTOs.
      *
-     * @return a list of all calculation records
+     * This method retrieves all calculationTable entities from the database,
+     * converts them to CalculationTableDto objects, and returns the list of DTOs.
+     *
+     * @return a list of CalculationTableDto representing all calculationTable records
      */
-    List<CalculationTable> findAllCalculations();
+    List<CalculationTableDto> findAllCalculations();
 
 
     /**
-     * Find a calculation by its ID.
+     * Retrieve an calculationTable by their ID.
      *
-     * @param id the ID of the calculation
-     * @return an Optional containing the found calculation or empty if not found
-     * @throws ResourceNotFoundException if no calculation is found with the provided ID
+     * This method fetches the calculationTable data by ID and returns it as a DTO.
+     *
+     * @param id the ID of the calculationTable
+     * @return an Optional containing the calculationTable as a DTO if found, otherwise empty
+     * @throws ResourceNotFoundException if the calculationTable with the given ID does not exist
      */
-    Optional<CalculationTable> findCalculationById(Long id) throws ResourceNotFoundException;
+    Optional<CalculationTableDto> findCalculationById(Long id) throws ResourceNotFoundException;
 
 
     /**
-     * Save a new calculation record.
+     * Save a new calculationTable record.
      *
-     * @param calculationDetails the calculation record to be saved
-     * @return the saved calculation record
-     * @throws CalculationTableException if the calculation data is invalid
+     * This method saves a new calculationTable using the information provided in the CalculationTableDto
+     * and returns the saved calculationTable as an CalculationTableDto.
+     *
+     * @param calculationTableDto the DTO containing the calculationTable information to be saved
+     * @return the saved calculationTable as a DTO
+     * @throws EmployeeException if the calculationTable data is invalid
      */
-    CalculationTable saveCalculation(CalculationTable calculationDetails) throws CalculationTableException;
+    CalculationTableDto saveCalculation(CalculationTableDto calculationTableDto) throws CalculationTableException;
 
 
     /**
-     * Update an existing calculation record.
+     * Update an existing calculationTable record.
      *
-     * @param id the ID of the calculation to be updated
-     * @param calculationTableDetails the new details for the calculation
-     * @return the updated calculation record
-     * @throws ResourceNotFoundException if no calculation is found with the provided ID
+     * This method updates the details of an calculationTable based on the provided calculationTable ID
+     * and the new details contained in the CalculationTableDto. It returns the updated calculationTable
+     * as an CalculationTableDto.
+     *
+     * @param id the ID of the calculationTable to be updated
+     * @param calculationTableDto the new details for the employee
+     * @return the updated calculationTable as a DTO
+     * @throws ResourceNotFoundException if the calculationTable is not found with the given ID
      */
-    CalculationTable updateCalculationTable(Long id, CalculationTable calculationTableDetails) throws ResourceNotFoundException;
+    CalculationTableDto updateCalculationTable(Long id, CalculationTableDto calculationTableDto) throws ResourceNotFoundException;
 
 
 
 
     /**
-     * Delete a calculation record by its ID.
+     * Delete an calculationTable by their ID.
      *
-     * @param id the ID of the calculation to be deleted
-     * @throws ResourceNotFoundException if the calculation record is not found
+     * This method finds the calculationTable by their ID and removes the calculationTable from the database.
+     *
+     * @param id the ID of the calculationTable to delete
+     * @throws ResourceNotFoundException if the calculationTable is not found
      */
     void deleteCalculation(Long id) throws ResourceNotFoundException;
 
@@ -76,6 +92,7 @@ public interface CalculationTableService {
     List<Object[]> getEmployeesWithHigherSalary(int month, double threshold);
 
 
+
     /**
      * Get a list of employees working in different regions for a specific month.
      *
@@ -83,6 +100,7 @@ public interface CalculationTableService {
      * @return a list of employees working in various regions
      */
     List<Object[]> getEmployeesByRegion(int month);
+
 
 
     /**
@@ -93,6 +111,7 @@ public interface CalculationTableService {
      * @return a list containing the average salary information
      */
     List<Object[]> getAverageSalaryByOrganization(int month, Long organizationId);
+
 
 
     /**

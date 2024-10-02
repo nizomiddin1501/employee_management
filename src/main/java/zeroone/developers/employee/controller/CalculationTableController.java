@@ -3,11 +3,13 @@ package zeroone.developers.employee.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import zeroone.developers.employee.entity.CalculationTable;
+import zeroone.developers.employee.payload.CalculationTableDto;
 import zeroone.developers.employee.service.CalculationTableService;
 
 import java.util.List;
@@ -129,70 +131,85 @@ public class CalculationTableController {
 
 
     /**
-     * Get all calculations.
+     * Retrieve a list of all calculationTables.
      *
-     * @return a list of all calculations
+     * This method fetches all calculationTable records and returns them as a list of CalculationTableDto.
+     *
+     * @return a ResponseEntity containing a list of CalculationTableDto representing all calculationTables
      */
     @Operation(summary = "Get all Calculations", description = "Retrieve a list of all calculations.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved the list of calculations.")
     @GetMapping
-    public List<CalculationTable> getAllCalculations() {
-        return calculationTableService.findAllCalculations();
+    public ResponseEntity<List<CalculationTableDto>> getAllCalculations() {
+        List<CalculationTableDto> calculationTableDtos = calculationTableService.findAllCalculations();
+        return new ResponseEntity<>(calculationTableDtos, HttpStatus.OK);
     }
 
 
 
     /**
-     * Get Calculation by ID.
+     * Retrieve an calculationTable by their unique ID using the provided CalculationTableDto.
      *
-     * @param id the ID of the calculation
-     * @return a ResponseEntity containing the calculation if found
+     * This method retrieves an calculationTable's details based on their ID and returns
+     * the corresponding CalculationTableDto if found. If the calculationTable does not exist,
+     * it returns a 404 Not Found status.
+     *
+     * @param id the ID of the calculationTable to retrieve
+     * @return a ResponseEntity containing the CalculationTableDto and an HTTP status of OK,
+     *         or NOT FOUND if the calculationTable does not exist
      */
     @Operation(summary = "Get Calculation by ID", description = "Retrieve a calculation by their unique identifier.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved the calculation.")
     @ApiResponse(responseCode = "404", description = "Calculation not found.")
     @GetMapping("/{id}")
-    public ResponseEntity<CalculationTable> getCalculationById(@PathVariable Long id) {
-        Optional<CalculationTable> calculation = calculationTableService.findCalculationById(id);
-        return calculation.map(ResponseEntity::ok)
+    public ResponseEntity<CalculationTableDto> getCalculationById(@PathVariable Long id) {
+        Optional<CalculationTableDto> calculationTableDto = calculationTableService.findCalculationById(id);
+        return calculationTableDto.map(ResponseEntity::ok)
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
 
 
     /**
-     * Create a new Calculation.
+     * Creates a new calculationTable.
      *
-     * @param calculationTable the calculation record to be created
-     * @return a ResponseEntity containing the created calculation
+     * This method validates the incoming calculationTable data (received via DTO) and saves it to the database
+     * if valid.
+     *
+     * @param calculationTableDto the DTO containing the calculationTable information to be saved
+     * @return a ResponseEntity containing the saved calculationTable data
      */
     @Operation(summary = "Create a new Calculation", description = "Create a new calculation record.")
     @ApiResponse(responseCode = "201", description = "Calculation created successfully.")
     @PostMapping
-    public ResponseEntity<CalculationTable> createCalculation(@RequestBody CalculationTable calculationTable) {
-        CalculationTable savedCalculation = calculationTableService.saveCalculation(calculationTable);
+    public ResponseEntity<CalculationTableDto> createCalculation(@Valid @RequestBody CalculationTableDto calculationTableDto) {
+        CalculationTableDto savedCalculation = calculationTableService.saveCalculation(calculationTableDto);
         return new ResponseEntity<>(savedCalculation, HttpStatus.CREATED);
     }
 
 
 
     /**
-     * Update a calculation table entry.
+     * Update the details of an existing calculationTable using the provided CalculationTableDto.
      *
-     * @param id                   the ID of the calculation to be updated
-     * @param calculationTableDetails the new details for the calculation
-     * @return a ResponseEntity containing the updated calculation
+     * This method accepts the calculationTable's ID and a DTO containing updated calculationTable details.
+     * It updates the calculationTable record if it exists and returns the updated CalculationTableDto object.
+     *
+     * @param id the ID of the calculationTable to be updated
+     * @param calculationTableDto the DTO containing updated calculationTable details
+     * @return a ResponseEntity containing the updated CalculationTableDto and an HTTP status of OK,
+     *         or NOT FOUND if the calculationTable does not exist
      */
     @Operation(summary = "Update a calculation table entry", description = "Update the details of an existing Calculation.")
     @ApiResponse(responseCode = "200", description = "Calculation table updated successfully")
     @ApiResponse(responseCode = "404", description = "Calculation table not found")
     @PutMapping("/{id}")
-    public ResponseEntity<CalculationTable> updateCalculation(
+    public ResponseEntity<CalculationTableDto> updateCalculation(
             @PathVariable Long id,
-            @RequestBody CalculationTable calculationTableDetails) {
-        Optional<CalculationTable> calculation = calculationTableService.findCalculationById(id);
-        if (calculation.isPresent()) {
-            CalculationTable updatedCalculationTable = calculationTableService.updateCalculationTable(id, calculationTableDetails);
+            @RequestBody CalculationTableDto calculationTableDto) {
+        Optional<CalculationTableDto> calculationTableDtoOptional = calculationTableService.findCalculationById(id);
+        if (calculationTableDtoOptional.isPresent()) {
+            CalculationTableDto updatedCalculationTable = calculationTableService.updateCalculationTable(id, calculationTableDto);
             return new ResponseEntity<>(updatedCalculationTable, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -202,18 +219,21 @@ public class CalculationTableController {
 
 
     /**
-     * Delete Calculation.
+     * Delete an calculationTable by their ID.
      *
-     * @param id the ID of the calculation to be deleted
-     * @return a ResponseEntity with no content if deleted successfully
+     * This method deletes the calculationTable record based on the given ID if it exists.
+     *
+     * @param id the ID of the calculationTable to delete
+     * @return a ResponseEntity with HTTP status NO CONTENT if successful,
+     *         or NOT FOUND if the calculationTable does not exist
      */
     @Operation(summary = "Delete Calculation", description = "Delete a calculation by its ID.")
     @ApiResponse(responseCode = "204", description = "Calculation deleted successfully.")
     @ApiResponse(responseCode = "404", description = "Calculation not found.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCalculation(@PathVariable Long id) {
-        Optional<CalculationTable> calculation = calculationTableService.findCalculationById(id);
-        if (calculation.isPresent()) {
+        Optional<CalculationTableDto> calculationTableDto = calculationTableService.findCalculationById(id);
+        if (calculationTableDto.isPresent()) {
             calculationTableService.deleteCalculation(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {

@@ -1,12 +1,24 @@
 package zeroone.developers.employee.payload;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
+
 import java.sql.Date;
 
 public class EmployeeDto {
 
     private Long id;
+
+    @NotEmpty(message = "First name is required")
+    @Size(min = 2, message = "First name must be at least 2 characters")
     private String firstName;
+
+    @NotEmpty(message = "Last name is required")
+    @Size(min = 2, message = "Last name must be at least 2 characters")
     private String lastName;
+
+    @NotEmpty(message = "Pinfl is required")
+    @Size(min = 2, message = "Employee's pinfl must be at least 2 characters")
     private String pinfl;
     private Date hireDate;
     private OrganizationDto organization;

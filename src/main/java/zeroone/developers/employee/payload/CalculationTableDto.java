@@ -1,5 +1,8 @@
 package zeroone.developers.employee.payload;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
+
 import java.sql.Date;
 
 public class CalculationTableDto {
@@ -7,7 +10,13 @@ public class CalculationTableDto {
 
     private Long id;
     private EmployeeDto employee;
+
+//    @NotEmpty(message = "Amount is required")
+//    @Size(min = 2, message = "Amount must be at least 2 characters")
     private Double amount;
+
+//    @NotEmpty(message = "First name is required")
+//    @Size(min = 2, message = "First name must be at least 2 characters")
     private Double rate;
     private Date date;
     private OrganizationDto organization;
