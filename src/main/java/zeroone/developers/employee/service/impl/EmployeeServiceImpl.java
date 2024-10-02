@@ -22,22 +22,21 @@ import java.util.stream.Collectors;
 public class EmployeeServiceImpl implements EmployeeService {
 
 
-    @Autowired
-    private ModelMapper modelMapper;
 
-
+    private final ModelMapper modelMapper;
     private final EmployeeRepository employeeRepository;
 
     /**
-     * Constructor with dependency injection for EmployeeRepository.
+     * Constructor with dependency injection for EmployeeRepository and ModelMapper.
      *
      * @param employeeRepository the repository for Employee operations
+     * @param modelMapper the mapper for conversion operations dto to entity
      */
     @Autowired
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+    public EmployeeServiceImpl(ModelMapper modelMapper, EmployeeRepository employeeRepository) {
+        this.modelMapper = modelMapper;
         this.employeeRepository = employeeRepository;
     }
-
 
     /**
      * Retrieve all employee records as DTOs.
