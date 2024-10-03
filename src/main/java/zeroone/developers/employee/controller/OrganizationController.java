@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import zeroone.developers.employee.entity.Organization;
+import zeroone.developers.employee.payload.CustomApiResponse;
+import zeroone.developers.employee.payload.EmployeeDto;
 import zeroone.developers.employee.payload.OrganizationDto;
 import zeroone.developers.employee.service.OrganizationService;
 
@@ -45,14 +47,19 @@ public class OrganizationController {
      *
      * This method fetches all organization records and returns them as a list of OrganizationDto.
      *
-     * @return a ResponseEntity containing a list of OrganizationDto representing all organizations
+     * @return a ResponseEntity containing a CustomApiResponse with the list of OrganizationDto representing all organizations
      */
     @Operation(summary = "Get all Organizations", description = "Retrieve a list of all organizations.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved the list of organizations.")
     @GetMapping
-    public ResponseEntity<List<OrganizationDto>> getAllOrganizations() {
+    public ResponseEntity<CustomApiResponse<List<OrganizationDto>>> getAllOrganizations() {
         List<OrganizationDto> organizationDtos = organizationService.findAllOrganizations();
-        return new ResponseEntity<>(organizationDtos, HttpStatus.OK);
+        CustomApiResponse<List<OrganizationDto>> response = new CustomApiResponse<>(
+                "Successfully retrieved the list of organizations.",
+                true,
+                organizationDtos
+        );
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -61,21 +68,35 @@ public class OrganizationController {
      * Retrieve an organization by their unique ID using the provided OrganizationDto.
      *
      * This method retrieves an organization's details based on their ID and returns
-     * the corresponding OrganizationDto if found. If the organization does not exist,
-     * it returns a 404 Not Found status.
+     * a CustomApiResponse containing the corresponding OrganizationDto if found.
+     * If the organization does not exist, it returns a CustomApiResponse with a
+     * message indicating that the organization was not found and a 404 Not Found status.
      *
      * @param id the ID of the organization to retrieve
-     * @return a ResponseEntity containing the OrganizationDto and an HTTP status of OK,
-     *         or NOT FOUND if the organization does not exist
+     * @return a ResponseEntity containing a CustomApiResponse with the OrganizationDto and
+     *         an HTTP status of OK, or a NOT FOUND status if the organization does not exist.
      */
     @Operation(summary = "Get Organization by ID", description = "Retrieve an organization by their unique identifier.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved the organization.")
     @ApiResponse(responseCode = "404", description = "Organization not found.")
     @GetMapping("/{id}")
-    public ResponseEntity<OrganizationDto> getOrganizationById(@PathVariable Long id) {
+    public ResponseEntity<CustomApiResponse<OrganizationDto>> getOrganizationById(@PathVariable Long id) {
         Optional<OrganizationDto> organizationDto = organizationService.findOrganizationById(id);
-        return organizationDto.map(ResponseEntity::ok)
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        if (organizationDto.isPresent()){
+            CustomApiResponse<OrganizationDto> response = new CustomApiResponse<>(
+                    "Successfully retrieved the organization.",
+                    true,
+                    organizationDto.get()
+            );
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            CustomApiResponse<OrganizationDto> response = new CustomApiResponse<>(
+                    "Organization not found.",
+                    false,
+                    null
+            );
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -87,14 +108,19 @@ public class OrganizationController {
      * if valid.
      *
      * @param organizationDto the DTO containing the organization information to be saved
-     * @return a ResponseEntity containing the saved organization data
+     * @return a ResponseEntity containing a CustomApiResponse with the saved organization data
      */
     @Operation(summary = "Create a new Organization", description = "Create a new organization record.")
     @ApiResponse(responseCode = "201", description = "Organization created successfully.")
     @PostMapping
-    public ResponseEntity<OrganizationDto> createOrganization(@Valid @RequestBody OrganizationDto organizationDto) {
+    public ResponseEntity<CustomApiResponse<OrganizationDto>> createOrganization(@Valid @RequestBody OrganizationDto organizationDto) {
         OrganizationDto savedOrganization = organizationService.saveOrganization(organizationDto);
-        return new ResponseEntity<>(savedOrganization, HttpStatus.CREATED);
+        CustomApiResponse<OrganizationDto> response = new CustomApiResponse<>(
+                "Organization created successfully",
+                true,
+                savedOrganization
+        );
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 
@@ -107,22 +133,32 @@ public class OrganizationController {
      *
      * @param id the ID of the organization to be updated
      * @param organizationDto the DTO containing updated organization details
-     * @return a ResponseEntity containing the updated OrganizationDto and an HTTP status of OK,
-     *         or NOT FOUND if the organization does not exist
+     * @return a ResponseEntity containing a CustomApiResponse with the updated OrganizationDto,
+     *         or a NOT FOUND response if the organization does not exist
      */
     @Operation(summary = "Update organization", description = "Update the details of an existing organization.")
     @ApiResponse(responseCode = "200", description = "Organization updated successfully")
     @ApiResponse(responseCode = "404", description = "Organization not found")
     @PutMapping("/{id}")
-    public ResponseEntity<OrganizationDto> updateOrganization(
+    public ResponseEntity<CustomApiResponse<OrganizationDto>> updateOrganization(
             @PathVariable Long id,
             @RequestBody OrganizationDto organizationDto) {
         Optional<OrganizationDto> organizationDtoOptional = organizationService.findOrganizationById(id);
         if (organizationDtoOptional.isPresent()) {
             OrganizationDto updatedOrganization = organizationService.updateOrganization(id, organizationDto);
-            return new ResponseEntity<>(updatedOrganization, HttpStatus.OK);
+            CustomApiResponse<OrganizationDto> response = new CustomApiResponse<>(
+                    "Organization updated successfully",
+                    true,
+                    updatedOrganization
+            );
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            CustomApiResponse<OrganizationDto> response = new CustomApiResponse<>(
+                    "Organization not found",
+                    false,
+                    null
+            );
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -134,31 +170,28 @@ public class OrganizationController {
      * This method deletes the organization record based on the given ID if it exists.
      *
      * @param id the ID of the organization to delete
-     * @return a ResponseEntity with HTTP status NO CONTENT if successful,
+     * @return a ResponseEntity containing a CustomApiResponse with the status of the operation,
      *         or NOT FOUND if the organization does not exist
      */
     @Operation(summary = "Delete Organization", description = "Delete an organization by its ID.")
     @ApiResponse(responseCode = "204", description = "Organization deleted successfully.")
     @ApiResponse(responseCode = "404", description = "Organization not found.")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrganization(@PathVariable Long id) {
+    public ResponseEntity<CustomApiResponse<Void>> deleteOrganization(@PathVariable Long id) {
         Optional<OrganizationDto> organizationDto = organizationService.findOrganizationById(id);
         if (organizationDto.isPresent()) {
             organizationService.deleteOrganization(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            CustomApiResponse<Void> customApiResponse = new CustomApiResponse<>(
+                    "Organization deleted successfully.",
+                    true,
+                    null);
+            return new ResponseEntity<>(customApiResponse, HttpStatus.NO_CONTENT);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            CustomApiResponse<Void> customApiResponse = new CustomApiResponse<>(
+                    "Organization not found with ID: " + id,
+                    false,
+                    null);
+            return new ResponseEntity<>(customApiResponse, HttpStatus.NOT_FOUND);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
 }

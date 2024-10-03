@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import zeroone.developers.employee.entity.Region;
+import zeroone.developers.employee.payload.CustomApiResponse;
 import zeroone.developers.employee.payload.RegionDto;
 import zeroone.developers.employee.service.RegionService;
 
@@ -40,14 +40,19 @@ public class RegionController {
      *
      * This method fetches all region records and returns them as a list of RegionDto.
      *
-     * @return a ResponseEntity containing a list of RegionDto representing all regions
+     * @return a ResponseEntity containing a CustomApiResponse with the list of RegionDto representing all regions
      */
     @Operation(summary = "Get all Regions", description = "Retrieve a list of all regions.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved the list of regions.")
     @GetMapping
-    public ResponseEntity<List<RegionDto>> getAllRegions() {
+    public ResponseEntity<CustomApiResponse<List<RegionDto>>> getAllRegions() {
         List<RegionDto> regionDtos = regionService.findAllRegions();
-        return new ResponseEntity<>(regionDtos, HttpStatus.OK);
+        CustomApiResponse<List<RegionDto>> response = new CustomApiResponse<>(
+                "Successfully retrieved the list of regions.",
+                true,
+                regionDtos
+        );
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -56,21 +61,35 @@ public class RegionController {
      * Retrieve a region by their unique ID using the provided RegionDto.
      *
      * This method retrieves a region's details based on their ID and returns
-     * the corresponding RegionDto if found. If the region does not exist,
-     * it returns a 404 Not Found status.
+     * a CustomApiResponse containing the corresponding RegionDto if found.
+     * If the region does not exist, it returns a CustomApiResponse with a
+     * message indicating that the region was not found and a 404 Not Found status.
      *
      * @param id the ID of the region to retrieve
-     * @return a ResponseEntity containing the RegionDto and an HTTP status of OK,
-     *         or NOT FOUND if the region does not exist
+     * @return a ResponseEntity containing a CustomApiResponse with the RegionDto and
+     *         an HTTP status of OK, or a NOT FOUND status if the region does not exist.
      */
     @Operation(summary = "Get Region by ID", description = "Retrieve a region by their unique identifier.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved the region.")
     @ApiResponse(responseCode = "404", description = "Region not found.")
     @GetMapping("/{id}")
-    public ResponseEntity<RegionDto> getRegionById(@PathVariable Long id) {
+    public ResponseEntity<CustomApiResponse<RegionDto>> getRegionById(@PathVariable Long id) {
         Optional<RegionDto> regionDto = regionService.findRegionById(id);
-        return regionDto.map(ResponseEntity::ok)
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        if (regionDto.isPresent()){
+            CustomApiResponse<RegionDto> response = new CustomApiResponse<>(
+                    "Successfully retrieved the region.",
+                    true,
+                    regionDto.get()
+            );
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            CustomApiResponse<RegionDto> response = new CustomApiResponse<>(
+                    "Region not found.",
+                    false,
+                    null
+            );
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -82,14 +101,19 @@ public class RegionController {
      * if valid.
      *
      * @param regionDto the DTO containing the region information to be saved
-     * @return a ResponseEntity containing the saved region data
+     * @return a ResponseEntity containing a CustomApiResponse with the saved region data
      */
     @Operation(summary = "Create a new Region", description = "Create a new region record.")
     @ApiResponse(responseCode = "201", description = "Region created successfully.")
     @PostMapping
-    public ResponseEntity<RegionDto> createRegion(@RequestBody RegionDto regionDto) {
+    public ResponseEntity<CustomApiResponse<RegionDto>> createRegion(@RequestBody RegionDto regionDto) {
         RegionDto savedRegion = regionService.saveRegion(regionDto);
-        return new ResponseEntity<>(savedRegion, HttpStatus.CREATED);
+        CustomApiResponse<RegionDto> response = new CustomApiResponse<>(
+                "Region created successfully",
+                true,
+                savedRegion
+        );
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 
@@ -102,47 +126,65 @@ public class RegionController {
      *
      * @param id the ID of the region to be updated
      * @param regionDto the DTO containing updated region details
-     * @return a ResponseEntity containing the updated RegionDto and an HTTP status of OK,
-     *         or NOT FOUND if the region does not exist
+     * @return a ResponseEntity containing a CustomApiResponse with the updated RegionDto,
+     *         or a NOT FOUND response if the region does not exist
      */
     @Operation(summary = "Update region", description = "Update the details of an existing region.")
     @ApiResponse(responseCode = "200", description = "Region updated successfully")
     @ApiResponse(responseCode = "404", description = "Region not found")
     @PutMapping("/{id}")
-    public ResponseEntity<RegionDto> updateRegion(
+    public ResponseEntity<CustomApiResponse<RegionDto>> updateRegion(
             @PathVariable Long id,
             @RequestBody RegionDto regionDto) {
         Optional<RegionDto> regionDtoOptional = regionService.findRegionById(id);
         if (regionDtoOptional.isPresent()) {
             RegionDto updatedRegion = regionService.updateRegion(id, regionDto);
-            return new ResponseEntity<>(updatedRegion, HttpStatus.OK);
+            CustomApiResponse<RegionDto> response = new CustomApiResponse<>(
+                    "Region updated successfully",
+                    true,
+                    updatedRegion
+            );
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            CustomApiResponse<RegionDto> response = new CustomApiResponse<>(
+                    "Region not found",
+                    false,
+                    null
+            );
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
     }
 
 
 
     /**
-     * Delete an region by their ID.
+     * Delete a region by their ID.
      *
      * This method deletes the region record based on the given ID if it exists.
      *
      * @param id the ID of the region to delete
-     * @return a ResponseEntity with HTTP status NO CONTENT if successful,
+     * @return a ResponseEntity containing a CustomApiResponse with the status of the operation,
      *         or NOT FOUND if the region does not exist
      */
     @Operation(summary = "Delete Region", description = "Delete a region by its ID.")
     @ApiResponse(responseCode = "204", description = "Region deleted successfully.")
     @ApiResponse(responseCode = "404", description = "Region not found.")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRegion(@PathVariable Long id) {
+    public ResponseEntity<CustomApiResponse<Void>> deleteRegion(@PathVariable Long id) {
         Optional<RegionDto> regionDto = regionService.findRegionById(id);
         if (regionDto.isPresent()) {
             regionService.deleteRegion(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            CustomApiResponse<Void> customApiResponse = new CustomApiResponse<>(
+                    "Region deleted successfully.",
+                    true,
+                    null);
+            return new ResponseEntity<>(customApiResponse, HttpStatus.NO_CONTENT);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            CustomApiResponse<Void> customApiResponse = new CustomApiResponse<>(
+                    "Region not found with ID: " + id,
+                    false,
+                    null);
+            return new ResponseEntity<>(customApiResponse, HttpStatus.NOT_FOUND);
         }
     }
 

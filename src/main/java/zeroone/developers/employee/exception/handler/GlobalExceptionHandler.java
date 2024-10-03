@@ -14,8 +14,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<CustomApiResponse> resourceNotFoundExceptionHandler(ResourceNotFoundException ex){
         String message = ex.getMessage();
-        CustomApiResponse apiResponse = new CustomApiResponse(message,false);
-        return new ResponseEntity<CustomApiResponse>(apiResponse, HttpStatus.NOT_FOUND);
+        CustomApiResponse apiResponse = new CustomApiResponse(message,false,null);
+        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
 
     }
 
