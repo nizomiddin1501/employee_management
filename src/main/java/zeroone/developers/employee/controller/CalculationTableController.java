@@ -39,15 +39,20 @@ public class CalculationTableController {
         this.calculationTableService = calculationTableService;
     }
 
+    ///
     //native query methods
 
 
     /**
      * Get employees with higher salary than the specified threshold.
      *
-     * @param month    the month for which the report is generated
+     * This method retrieves a list of employees who earned more than a specified threshold
+     * in the given month. If no employees are found, it returns a 404 Not Found status with a message.
+     *
+     * @param month the month for which the report is generated
      * @param threshold the salary threshold
-     * @return a ResponseEntity containing a list of employees with salaries above the threshold
+     * @return a ResponseEntity containing a CustomApiResponse with either the list of employees
+     *         with higher salary and an HTTP status of OK, or a message and NOT FOUND status if no employees are found.
      */
     @Operation(summary = "Get employees with higher salary than the specified threshold",
             description = "Returns a list of employees who earned more than a specified threshold in the given month.")
@@ -57,10 +62,28 @@ public class CalculationTableController {
             @ApiResponse(responseCode = "404", description = "Data not found for the provided parameters")
     })
     @GetMapping("/reports/high-salary")
-    public ResponseEntity<List<Object[]>> getEmployeesWithHigherSalary(
+    public ResponseEntity<CustomApiResponse<List<Object[]>>> getEmployeesWithHigherSalary(
             @RequestParam int month, @RequestParam double threshold) {
         List<Object[]> results = calculationTableService.getEmployeesWithHigherSalary(month, threshold);
-        return ResponseEntity.ok(results);
+
+        if (results.isEmpty()) {
+            // No data found
+            CustomApiResponse<List<Object[]>> response = new CustomApiResponse<>(
+                    "No employees found with higher salary for the provided month and threshold.",
+                    false,
+                    null
+            );
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+
+        // Success response
+        CustomApiResponse<List<Object[]>> response = new CustomApiResponse<>(
+                "Successfully retrieved list of employees with higher salary.",
+                true,
+                results
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -68,8 +91,14 @@ public class CalculationTableController {
     /**
      * Get employees by region.
      *
+     * This method retrieves a list of employees who worked in different regions
+     * during the specified month. If no employees are found for the given month,
+     * it returns a 404 Not Found status with a corresponding message.
+     *
      * @param month the month for which the report is generated
-     * @return a ResponseEntity containing a list of employees by region
+     * @return a ResponseEntity containing a CustomApiResponse with either the list of
+     *         employees by region and an HTTP status of OK, or a message and NOT FOUND status
+     *         if no employees are found.
      */
     @Operation(summary = "Get employees by region",
             description = "Returns a list of employees who worked in different regions during the specified month.")
@@ -79,19 +108,43 @@ public class CalculationTableController {
             @ApiResponse(responseCode = "404", description = "Data not found for the provided parameters")
     })
     @GetMapping("/reports/region")
-    public ResponseEntity<List<Object[]>> getEmployeesByRegion(@RequestParam int month) {
+    public ResponseEntity<CustomApiResponse<List<Object[]>>> getEmployeesByRegion(@RequestParam int month) {
         List<Object[]> results = calculationTableService.getEmployeesByRegion(month);
-        return ResponseEntity.ok(results);
+
+        if (results.isEmpty()) {
+            // No data found
+            CustomApiResponse<List<Object[]>> response = new CustomApiResponse<>(
+                    "No employees found for the specified month and region.",
+                    false,
+                    null
+            );
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+
+        // Success response
+        CustomApiResponse<List<Object[]>> response = new CustomApiResponse<>(
+                "Successfully retrieved list of employees with same region worked.",
+                true,
+                results
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
 
     /**
-     * Get average salary for organization.
+     * Retrieves the average salary for a specified organization and month.
      *
-     * @param month          the month for which the report is generated
+     * This method calculates and returns the average salary of employees
+     * who worked for a given organization during the specified month.
+     * If no data is found for the provided organization and month, it returns a
+     * 404 Not Found status with an appropriate message.
+     *
+     * @param month the month for which the average salary report is generated
      * @param organizationId the ID of the organization
-     * @return a ResponseEntity containing the average salary for the specified organization
+     * @return a ResponseEntity containing a CustomApiResponse with either the average salary data
+     *         and an HTTP status of OK, or a message and NOT FOUND status if no data is found
      */
     @Operation(summary = "Get average salary for organization",
             description = "Returns the average salary of employees in a given organization for the specified month.")
@@ -101,19 +154,41 @@ public class CalculationTableController {
             @ApiResponse(responseCode = "404", description = "Organization or data not found")
     })
     @GetMapping("/reports/average-salary")
-    public ResponseEntity<List<Object[]>> getAverageSalaryByOrganization(
+    public ResponseEntity<CustomApiResponse<List<Object[]>>> getAverageSalaryByOrganization(
             @RequestParam int month, @RequestParam Long organizationId) {
         List<Object[]> results = calculationTableService.getAverageSalaryByOrganization(month, organizationId);
-        return ResponseEntity.ok(results);
+
+        if (results.isEmpty()){
+            // No data found
+            CustomApiResponse<List<Object[]>> response = new CustomApiResponse<>(
+                    "No data found for the specified organization and month.",
+                    false,
+                    null
+            );
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+
+        // Success response
+        CustomApiResponse<List<Object[]>> response = new CustomApiResponse<>(
+                "Successfully retrieved average salary for the specified organization.",
+                true,
+                results
+        );
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
 
     /**
-     * Get employees with salaries and vacations.
+     * Get employees who received both salary and vacation payments.
+     *
+     * This method retrieves a list of employees who received both salary
+     * and vacation payments for the specified month. If no such employees
+     * are found, it returns a 404 Not Found status with an appropriate message.
      *
      * @param month the month for which the report is generated
-     * @return a ResponseEntity containing a list of employees who received both salary and vacation payments
+     * @return a ResponseEntity containing a CustomApiResponse with either the data
+     *         of employees or a message if no data is found
      */
     @Operation(summary = "Get employees with salaries and vacations",
             description = "Returns a list of employees who received both salary and vacation payments in the specified month.")
@@ -123,12 +198,30 @@ public class CalculationTableController {
             @ApiResponse(responseCode = "404", description = "Data not found")
     })
     @GetMapping("/reports/salaries-vacations")
-    public ResponseEntity<List<Object[]>> getEmployeesWithSalariesAndVacations(@RequestParam int month) {
+    public ResponseEntity<CustomApiResponse<List<Object[]>>> getEmployeesWithSalariesAndVacations(@RequestParam int month) {
         List<Object[]> results = calculationTableService.getEmployeesWithSalariesAndVacations(month);
-        return ResponseEntity.ok(results);
+
+        if (results.isEmpty()) {
+            // No data found
+            CustomApiResponse<List<Object[]>> response = new CustomApiResponse<>(
+                    "No employees found with both salary and vacation payments for the provided month.",
+                    false,
+                    null
+            );
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+
+        // Success response
+        CustomApiResponse<List<Object[]>> response = new CustomApiResponse<>(
+                "Successfully retrieved list of employees with both salary and vacation payments.",
+                true,
+                results
+        );
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
+    ///
     //CRUD methods
 
 
