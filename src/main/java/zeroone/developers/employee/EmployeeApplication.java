@@ -13,4 +13,7 @@ public class EmployeeApplication {
     // for swagger documentation
     // http://localhost:8080/swagger-ui/index.html
 
+    // my portfolio
+    // https://nizomiddin-portfolio.netlify.app/
+
 }

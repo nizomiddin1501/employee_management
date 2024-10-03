@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import zeroone.developers.employee.entity.Employee;
+import zeroone.developers.employee.payload.CustomApiResponse;
 import zeroone.developers.employee.payload.EmployeeDto;
 import zeroone.developers.employee.service.EmployeeService;
 
@@ -138,31 +138,17 @@ public class EmployeeController {
     @ApiResponse(responseCode = "204", description = "Employee deleted successfully.")
     @ApiResponse(responseCode = "404", description = "Employee not found.")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity<CustomApiResponse> deleteEmployee(@PathVariable Long id) {
         Optional<EmployeeDto> employeeDto = employeeService.findEmployeeById(id);
         if (employeeDto.isPresent()) {
             employeeService.deleteEmployee(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            CustomApiResponse customApiResponse = new CustomApiResponse("Employee deleted successfully.", true);
+            return new ResponseEntity<>(customApiResponse, HttpStatus.NO_CONTENT);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            // Agar xodim topilmasa, CustomApiResponse qaytaramiz
+            CustomApiResponse customApiResponse = new CustomApiResponse("Employee not found with ID: " + id, false);
+            return new ResponseEntity<>(customApiResponse, HttpStatus.NOT_FOUND);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
