@@ -15,25 +15,30 @@ public class Employee {
     private Long id;
 
     @Column(nullable = false, length = 50)
-    @Schema(description = "Employee's first name", example = "Nizomiddin")
+    @Schema(description = "Employee's first name",
+            example = "Nizomiddin")
     private String firstName;
 
     @Column(length = 50)
-    @Schema(description = "Employee's last name", example = "Mirzanazarov")
+    @Schema(description = "Employee's last name",
+            example = "Mirzanazarov")
     private String lastName;
 
     @Column(length = 50, unique = true)
-    @Schema(description = "Employee's personal identification number (PINFL)", example = "12345678901234")
+    @Schema(description = "Employee's personal identification number (PINFL)",
+            example = "12345678901234")
     private String pinfl;
 
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
-    @Schema(description = "Date when the employee was hired", example = "2024-05-10")
+    @Schema(description = "Date when the employee was hired",
+            example = "2024-05-10")
     private Date hireDate;
 
     @ManyToOne
     @JoinColumn(name = "organization_id", nullable = false)
-    @Schema(description = "The organization where the employee works", example = "Organization(id=1, name=Zero:One Group)")
+    @Schema(description = "The organization where the employee works",
+            example = "Organization(id=1, name=Zero:One Group)")
     private Organization organization;
 
     public Employee() {

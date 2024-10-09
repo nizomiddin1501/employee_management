@@ -14,7 +14,8 @@ public class Region {
     private Long id;
 
     @Column(nullable = false, length = 20)
-    @Schema(description = "Name of the region", example = "Tashkent")
+    @Schema(description = "Name of the region",
+            example = "Tashkent")
     private String name;
 
 

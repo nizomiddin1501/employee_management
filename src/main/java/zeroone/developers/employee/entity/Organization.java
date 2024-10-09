@@ -14,17 +14,20 @@ public class Organization {
     private Long id;
 
     @Column(nullable = false, length = 50, unique = true)
-    @Schema(description = "Name of the organization", example = "Zero:One Group")
+    @Schema(description = "Name of the organization",
+            example = "Zero:One Group")
     private String name;
 
     @ManyToOne
     @JoinColumn(name = "region_id")
-    @Schema(description = "Region where the organization is located", example = "Region(id=1, name='Tashkent')")
+    @Schema(description = "Region where the organization is located",
+            example = "Region(id=1, name='Tashkent')")
     private Region region;
 
     @ManyToOne
     @JoinColumn(name = "parent_id", referencedColumnName = "id")
-    @Schema(description = "Parent organization if any, otherwise null", example = "null or Organization(id=2, name='Zero:One Education')")
+    @Schema(description = "Parent organization if any, otherwise null",
+            example = "null or Organization(id=2, name='Zero:One Education')")
     private Organization parent;
 
     public Organization() {
