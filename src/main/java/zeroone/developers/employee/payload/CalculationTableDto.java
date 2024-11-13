@@ -1,8 +1,5 @@
 package zeroone.developers.employee.payload;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
-
 import java.sql.Date;
 
 public class CalculationTableDto {

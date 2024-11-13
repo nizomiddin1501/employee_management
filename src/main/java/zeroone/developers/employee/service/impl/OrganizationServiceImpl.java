@@ -49,8 +49,6 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public List<OrganizationDto> findAllOrganizations() {
         List<Organization> organizations = organizationRepository.findAll();
-
-        // Convert the list of Organization entities to OrganizationDto
         return organizations.stream()
                 .map(this::organizationToDto)
                 .collect(Collectors.toList());
@@ -67,13 +65,10 @@ public class OrganizationServiceImpl implements OrganizationService {
      * @throws ResourceNotFoundException if the organization is not found with the given ID
      */
     @Override
-    public Optional<OrganizationDto> findOrganizationById(Long id) {
+    public Optional<OrganizationDto> findOrganizationById(Long id) throws ResourceNotFoundException {
         Organization organization = organizationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Organization not found with id " + id));
-
-        // Convert Organization entity to OrganizationDto
-        OrganizationDto organizationDto = organizationToDto(organization);
-        return Optional.ofNullable(organizationDto);
+        return Optional.of(organizationToDto(organization));
     }
 
 

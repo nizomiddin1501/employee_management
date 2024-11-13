@@ -1,5 +1,6 @@
 package zeroone.developers.employee.service;
 
+import org.springframework.data.domain.Page;
 import zeroone.developers.employee.entity.Employee;
 import zeroone.developers.employee.exception.EmployeeException;
 import zeroone.developers.employee.exception.ResourceNotFoundException;
@@ -25,6 +26,8 @@ public interface EmployeeService {
      */
     List<EmployeeDto> findAllEmployees();
 
+    Page<EmployeeDto> getAllEmployees(int page, int size);
+
 
     /**
      * Retrieve an employee by their ID.
@@ -33,9 +36,8 @@ public interface EmployeeService {
      *
      * @param id the ID of the employee
      * @return an Optional containing the employee as a DTO if found, otherwise empty
-     * @throws ResourceNotFoundException if the employee with the given ID does not exist
      */
-    Optional<EmployeeDto> findEmployeeById(Long id) throws ResourceNotFoundException;
+    Optional<EmployeeDto> findEmployeeById(Long id);
 
 
     /**
@@ -46,9 +48,8 @@ public interface EmployeeService {
      *
      * @param employeeDto the DTO containing the employee information to be saved
      * @return the saved employee as a DTO
-     * @throws EmployeeException if the employee data is invalid
      */
-    EmployeeDto saveEmployee(EmployeeDto employeeDto) throws EmployeeException;
+    EmployeeDto saveEmployee(EmployeeDto employeeDto);
 
 
     /**
@@ -61,9 +62,8 @@ public interface EmployeeService {
      * @param id the ID of the employee to be updated
      * @param employeeDto the new details for the employee
      * @return the updated employee as a DTO
-     * @throws ResourceNotFoundException if the employee is not found with the given ID
      */
-    EmployeeDto updateEmployee(Long id, EmployeeDto employeeDto) throws ResourceNotFoundException;
+    EmployeeDto updateEmployee(Long id, EmployeeDto employeeDto);
 
 
     /**
@@ -72,9 +72,8 @@ public interface EmployeeService {
      * This method finds the employee by their ID and removes the employee from the database.
      *
      * @param id the ID of the employee to delete
-     * @throws ResourceNotFoundException if the employee is not found
      */
-    void deleteEmployee(Long id) throws ResourceNotFoundException;
+    void deleteEmployee(Long id);
 
 
 

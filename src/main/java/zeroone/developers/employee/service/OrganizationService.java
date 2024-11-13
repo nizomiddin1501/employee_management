@@ -35,9 +35,8 @@ public interface OrganizationService {
      *
      * @param id the ID of the organization
      * @return an Optional containing the organization as a DTO if found, otherwise empty
-     * @throws ResourceNotFoundException if the organization with the given ID does not exist
      */
-    Optional<OrganizationDto> findOrganizationById(Long id) throws ResourceNotFoundException;
+    Optional<OrganizationDto> findOrganizationById(Long id);
 
 
     /**
@@ -48,9 +47,8 @@ public interface OrganizationService {
      *
      * @param organizationDto the DTO containing the organization information to be saved
      * @return the saved organization as a DTO
-     * @throws EmployeeException if the organization data is invalid
      */
-    OrganizationDto saveOrganization(OrganizationDto organizationDto) throws OrganizationException;
+    OrganizationDto saveOrganization(OrganizationDto organizationDto);
 
 
     /**
@@ -63,9 +61,8 @@ public interface OrganizationService {
      * @param id the ID of the organization to be updated
      * @param organizationDto the new details for the organization
      * @return the updated organization as a DTO
-     * @throws ResourceNotFoundException if the organization is not found with the given ID
      */
-    OrganizationDto updateOrganization(Long id, OrganizationDto organizationDto) throws ResourceNotFoundException;
+    OrganizationDto updateOrganization(Long id, OrganizationDto organizationDto);
 
 
     /**
@@ -74,9 +71,8 @@ public interface OrganizationService {
      * This method finds the organization by their ID and removes the organization from the database.
      *
      * @param id the ID of the organization to delete
-     * @throws ResourceNotFoundException if the organization is not found
      */
-    void deleteOrganization(Long id) throws ResourceNotFoundException;
+    void deleteOrganization(Long id);
 
 
 

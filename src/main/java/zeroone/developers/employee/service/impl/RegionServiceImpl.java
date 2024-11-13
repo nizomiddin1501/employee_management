@@ -68,13 +68,10 @@ public class RegionServiceImpl implements RegionService {
      * @throws ResourceNotFoundException if the region is not found with the given ID
      */
     @Override
-    public Optional<RegionDto> findRegionById(Long id) {
+    public Optional<RegionDto> findRegionById(Long id) throws ResourceNotFoundException {
         Region region = regionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Region not found with id " + id));
-
-        // Convert Region entity to RegionDto
-        RegionDto regionDto = regionToDto(region);
-        return Optional.ofNullable(regionDto);
+        return Optional.of(regionToDto(region));
     }
 
 

@@ -2,6 +2,8 @@ package zeroone.developers.employee.service.impl;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import zeroone.developers.employee.entity.Employee;
 import zeroone.developers.employee.exception.EmployeeException;
@@ -49,12 +51,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<EmployeeDto> findAllEmployees() {
         List<Employee> employees = employeeRepository.findAll();
-
-        // Convert the list of Employee entities to EmployeeDto
         return employees.stream()
                 .map(this::employeeToDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Page<EmployeeDto> getAllEmployees(int page, int size) {
+        Page<Employee> productsPage = employeeRepository.findAll(PageRequest.of(page, size));
+        return productsPage.map(this::employeeToDto);
+    }
+
+
 
 
     /**
@@ -67,13 +75,10 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @throws ResourceNotFoundException if the employee is not found with the given ID
      */
     @Override
-    public Optional<EmployeeDto> findEmployeeById(Long id) {
+    public Optional<EmployeeDto> findEmployeeById(Long id) throws ResourceNotFoundException {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id " + id));
-
-        // Convert Employee entity to EmployeeDto
-        EmployeeDto employeeDto = employeeToDto(employee);
-        return Optional.ofNullable(employeeDto);
+        return Optional.of(employeeToDto(employee));
 
     }
 
@@ -109,7 +114,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         // 4. Save Employee
         Employee savedEmployee = employeeRepository.save(employee);
 
-        // 4. Convert the saved Employee to DTO and return
+        // 5. Convert the saved Employee to DTO and return
         return employeeToDto(savedEmployee);
 
 
@@ -176,6 +181,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Employee dtoToEmployee(EmployeeDto employeeDto) {
         return modelMapper.map(employeeDto, Employee.class);
     }
+
 
     // Entity to DTO conversion
     public EmployeeDto employeeToDto(Employee employee) {

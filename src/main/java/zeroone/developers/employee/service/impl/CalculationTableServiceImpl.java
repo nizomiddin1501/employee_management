@@ -103,8 +103,6 @@ public class CalculationTableServiceImpl implements CalculationTableService {
     @Override
     public List<CalculationTableDto> findAllCalculations() {
         List<CalculationTable> calculationTables = calculationTableRepository.findAll();
-
-        // Convert the list of CalculationTable entities to CalculationTableDto
         return calculationTables.stream()
                 .map(this::calculationTableToDto)
                 .collect(Collectors.toList());
@@ -121,13 +119,10 @@ public class CalculationTableServiceImpl implements CalculationTableService {
      * @throws ResourceNotFoundException if the calculationTable is not found with the given ID
      */
     @Override
-    public Optional<CalculationTableDto> findCalculationById(Long id) {
+    public Optional<CalculationTableDto> findCalculationById(Long id) throws ResourceNotFoundException {
         CalculationTable calculationTable = calculationTableRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Calculation not found with id " + id));
-
-        // Convert CalculationTable entity to CalculationTableDto
-        CalculationTableDto calculationTableDto = calculationTableToDto(calculationTable);
-        return Optional.ofNullable(calculationTableDto);
+        return Optional.of(calculationTableToDto(calculationTable));
     }
 
  /// bunga alohida doc yoz
@@ -145,25 +140,14 @@ public class CalculationTableServiceImpl implements CalculationTableService {
      */
     @Override
     public CalculationTableDto saveCalculation(CalculationTableDto calculationTableDto) throws CalculationTableException {
-        // 1. Convert DTO to entity
         CalculationTable calculationTable = dtoToCalculationTable(calculationTableDto);
-
-        // 2. Perform business checks on the entity
-
-        // Check if the amount is positive using repository query
         if (calculationTableRepository.existsInvalidAmount()) {
             throw new CalculationTableException("Calculation amount must be positive");
         }
-
-        // Check if the employee exists using repository query
         if (!calculationTableRepository.existsByEmployeeId(calculationTable.getEmployee().getId())) {
             throw new CalculationTableException("Employee must be provided for the calculation");
         }
-
-        // 3. Save CalculationTable
         CalculationTable savedCalculationTable = calculationTableRepository.save(calculationTable);
-
-        // 4. Convert the saved CalculationTable to DTO and return
         return calculationTableToDto(savedCalculationTable);
     }
 

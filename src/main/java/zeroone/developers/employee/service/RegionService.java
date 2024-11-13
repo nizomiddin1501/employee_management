@@ -32,9 +32,8 @@ public interface RegionService {
      *
      * @param id the ID of the region
      * @return an Optional containing the region as a DTO if found, otherwise empty
-     * @throws ResourceNotFoundException if the region with the given ID does not exist
      */
-    Optional<RegionDto> findRegionById(Long id) throws ResourceNotFoundException;
+    Optional<RegionDto> findRegionById(Long id);
 
 
 
@@ -46,9 +45,8 @@ public interface RegionService {
      *
      * @param regionDto the DTO containing the region information to be saved
      * @return the saved region as a DTO
-     * @throws RegionException if the region data is invalid
      */
-    RegionDto saveRegion(RegionDto regionDto) throws RegionException;
+    RegionDto saveRegion(RegionDto regionDto);
 
 
 
@@ -63,9 +61,8 @@ public interface RegionService {
      * @param id the ID of the region to be updated
      * @param regionDto the new details for the region
      * @return the updated region as a DTO
-     * @throws ResourceNotFoundException if the region is not found with the given ID
      */
-    RegionDto updateRegion(Long id, RegionDto regionDto) throws ResourceNotFoundException;
+    RegionDto updateRegion(Long id, RegionDto regionDto);
 
 
     /**
@@ -74,9 +71,8 @@ public interface RegionService {
      * This method finds the region by their ID and removes the region from the database.
      *
      * @param id the ID of the region to delete
-     * @throws ResourceNotFoundException if the region is not found
      */
-    void deleteRegion(Long id) throws ResourceNotFoundException;
+    void deleteRegion(Long id);
 
 
 
